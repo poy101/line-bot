@@ -355,18 +355,7 @@ public class KitchenSinkController {
     return sb.toString();
   }
 
-  public  JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-    InputStream is = new URL(url).openStream();
-    try {
-      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-      String jsonText = readAll(rd);
-      JSONObject json = new JSONObject(jsonText);
-      return json;
- } catch(Exception e){
-    } finally {
-      is.close();
-    }
-  }
+  
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
@@ -381,7 +370,7 @@ public class KitchenSinkController {
                 phoneNo = phoneNo.replaceAll("\\D+", "");
                 System.out.println(phoneNo);
                 if (!phoneNo.equals("")) {
-                    JSONObject json = readJsonFromUrl("http://192.168.1.3:8080/tmymobile/webservice/linebotjsp.jsp?act=lms&_phoneNumber="+phoneNo);
+                   // JSONObject json = readJsonFromUrl("http://192.168.1.3:8080/tmymobile/webservice/linebotjsp.jsp?act=lms&_phoneNumber="+phoneNo);
                   //  System.out.println(json.toString());
                  //   System.out.println(json.get("MEM_ID"));
      lineMessagingClient
@@ -394,7 +383,7 @@ public class KitchenSinkController {
                                     this.reply(
                                             replyToken,
                                             Arrays.asList(new TextMessage("UserID:"+userId),
-										new TextMessage("MEM_ID:"+json.get("MEM_ID")),
+										
 										new TextMessage(
                                                                   "Display name: " + profile.getDisplayName()),
                                                           new TextMessage("Status message: "
