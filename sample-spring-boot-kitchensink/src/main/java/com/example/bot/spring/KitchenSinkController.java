@@ -346,16 +346,7 @@ public class KitchenSinkController {
         );
     }
 
-	 private  String readAll(Reader rd) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    int cp;
-    while ((cp = rd.read()) != -1) {
-      sb.append((char) cp);
-    }
-    return sb.toString();
-  }
-
-  
+	
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
