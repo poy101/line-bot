@@ -348,7 +348,7 @@ public class KitchenSinkController {
 
 	
 
-    private void handleTextContent(String replyToken, Event event, TextMessageContent content)
+      private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
         final String text = content.getText();
 
@@ -385,11 +385,8 @@ public class KitchenSinkController {
 
                                 });
                     }
-					}else{
-					 this.replyText(replyToken, "Bot can't use profile API without user ID");
-				}
                 }
-            }else{
+}else{
         switch (text) {
             case "profile": {
                 log.info("Invoking 'profile' command: source:{}",
@@ -684,7 +681,8 @@ public class KitchenSinkController {
                 );
                 break;
         }
-			}
+}
+			
     }
 
     private static URI createUri(String path) {
