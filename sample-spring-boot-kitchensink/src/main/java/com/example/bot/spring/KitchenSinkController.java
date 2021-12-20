@@ -364,8 +364,10 @@ public class KitchenSinkController {
         log.info("Got text message from replyToken:{}: text:{} emojis:{}", replyToken, text,
                  content.getEmojis());
 		
-		    if (userId != null){
+		    
 				if((text.startsWith("sms") || text.startsWith("SMS"))) {
+					  final String userId = event.getSource().getUserId();
+					  if (userId != null){
                 String phoneNo = text.substring(3);
                 phoneNo = phoneNo.replaceAll("\\D+", "");
                 System.out.println(phoneNo);
@@ -392,9 +394,10 @@ public class KitchenSinkController {
 
                                 });
                     }
-                }}else{
+					}else{
 					 this.replyText(replyToken, "Bot can't use profile API without user ID");
 				}
+                }
             }else{
         switch (text) {
             case "profile": {
