@@ -33,15 +33,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.nio.charset.Charset;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.net.URL;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.Reader;
-import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -346,47 +337,12 @@ public class KitchenSinkController {
         );
     }
 
-	
-
-      private void handleTextContent(String replyToken, Event event, TextMessageContent content)
+    private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
         final String text = content.getText();
 
         log.info("Got text message from replyToken:{}: text:{} emojis:{}", replyToken, text,
                  content.getEmojis());
-		
-		    
-				if((text.startsWith("sms") || text.startsWith("SMS"))) {
-					  final String userId = event.getSource().getUserId();
-					  if (userId != null){
-                String phoneNo = text.substring(3);
-                phoneNo = phoneNo.replaceAll("\\D+", "");
-                System.out.println(phoneNo);
-                if (!phoneNo.equals("")) {
-                   // JSONObject json = readJsonFromUrl("http://192.168.1.3:8080/tmymobile/webservice/linebotjsp.jsp?act=lms&_phoneNumber="+phoneNo);
-                  //  System.out.println(json.toString());
-                 //   System.out.println(json.get("MEM_ID"));
-     lineMessagingClient
-                                .getProfile(userId)
-                                .whenComplete((profile, throwable) -> {
-                                    if (throwable != null) {
-                                        this.replyText(replyToken, throwable.getMessage());
-                                        return;
-                                    }
-                                    this.reply(
-                                            replyToken,
-                                            Arrays.asList(new TextMessage("UserID:"+userId),
-										
-										new TextMessage(
-                                                                  "Display name: " + profile.getDisplayName()),
-                                                          new TextMessage("Status message: "
-                                                                          + profile.getStatusMessage()))
-                                    );
-
-                                });
-                    }
-                }
-}else{
         switch (text) {
             case "profile": {
                 log.info("Invoking 'profile' command: source:{}",
@@ -419,10 +375,10 @@ public class KitchenSinkController {
                                         this.replyText(replyToken, throwable.getMessage());
                                         return;
                                     }
+
                                     this.reply(
                                             replyToken,
-                                            Arrays.asList(new TextMessage("UserID:"+userId),
-										new TextMessage(
+                                            Arrays.asList(new TextMessage(
                                                                   "Display name: " + profile.getDisplayName()),
                                                           new TextMessage("Status message: "
                                                                           + profile.getStatusMessage()))
@@ -681,8 +637,6 @@ public class KitchenSinkController {
                 );
                 break;
         }
-}
-			
     }
 
     private static URI createUri(String path) {
