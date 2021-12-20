@@ -33,6 +33,15 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.nio.charset.Charset;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.net.URL;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.Reader;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -337,12 +346,66 @@ public class KitchenSinkController {
         );
     }
 
+	 private static String readAll(Reader rd) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    int cp;
+    while ((cp = rd.read()) != -1) {
+      sb.append((char) cp);
+    }
+    return sb.toString();
+  }
+
+  public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+    InputStream is = new URL(url).openStream();
+    try {
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+      String jsonText = readAll(rd);
+      JSONObject json = new JSONObject(jsonText);
+      return json;
+    } finally {
+      is.close();
+    }
+  }
+
     private void handleTextContent(String replyToken, Event event, TextMessageContent content)
             throws Exception {
         final String text = content.getText();
 
         log.info("Got text message from replyToken:{}: text:{} emojis:{}", replyToken, text,
                  content.getEmojis());
+		
+		    if (userId != null){
+				if((text.startsWith("sms") || text.startsWith("SMS"))) {
+                String phoneNo = text.substring(3);
+                phoneNo = phoneNo.replaceAll("\\D+", "");
+                System.out.println(phoneNo);
+                if (!phoneNo.equals("")) {
+                    JSONObject json = readJsonFromUrl("http://192.168.1.3:8080/tmymobile/webservice/linebotjsp.jsp?act=lms&_phoneNumber="+phoneNo);
+                  //  System.out.println(json.toString());
+                 //   System.out.println(json.get("MEM_ID"));
+     lineMessagingClient
+                                .getProfile(userId)
+                                .whenComplete((profile, throwable) -> {
+                                    if (throwable != null) {
+                                        this.replyText(replyToken, throwable.getMessage());
+                                        return;
+                                    }
+                                    this.reply(
+                                            replyToken,
+                                            Arrays.asList(new TextMessage("UserID:"+userId),
+										new TextMessage("MEM_ID:"+json.get("MEM_ID")),
+										new TextMessage(
+                                                                  "Display name: " + profile.getDisplayName()),
+                                                          new TextMessage("Status message: "
+                                                                          + profile.getStatusMessage()))
+                                    );
+
+                                });
+                    }
+                }}else{
+					 this.replyText(replyToken, "Bot can't use profile API without user ID");
+				}
+            }else{
         switch (text) {
             case "profile": {
                 log.info("Invoking 'profile' command: source:{}",
@@ -637,6 +700,7 @@ public class KitchenSinkController {
                 );
                 break;
         }
+			}
     }
 
     private static URI createUri(String path) {
